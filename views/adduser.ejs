@@ -1,0 +1,46 @@
+<%-include("headder")-%>
+<div class="container">
+  <div class="row">  
+        <div class="container allSides col-sm-6">
+          <%-incorect-%>
+            <form action="/adduser" method="post">
+            <div class="col-sm-12">
+                    <h2>ADD USER</h2>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="name" placeholder="name" required/>
+                    </div><br>
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="email" placeholder="Email"/>
+                    </div><br>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="username" placeholder="User Name"/>
+                    </div><br>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="password" placeholder="User Password" required/>
+                    </div><br>
+                    <div class="form-group">
+                        <input type="number" class="form-control" name="phone" placeholder="phone number" maxlength="10" required/>
+                    </div><br>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="city" placeholder="City" required/>
+                    </div><br>
+                    <div class="form-group">
+                        <label>Role:</label>
+                            <select data-style="btn-info" name="role" class="form-control" >
+                                <optgroup label="Select User Role">
+                                       <option value="user">User</option>
+                                       <option value="commuity manager">Community Builder</option>
+                                       <option value="admin">Admin</option>
+                                </optgroup>
+                            </select>
+                            </div><br>
+                        <div class="form-group">
+                            <input type="submit" value="Add User" class="btn btn-success">
+                            <a value="Add User" class="btn btn-danger" href="/home">Cancel</a>
+                        </div>
+            </div>
+        </form>
+     </div>
+  </div> 
+</div>
+<%-include("footer")-%>

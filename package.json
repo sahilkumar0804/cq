@@ -1,0 +1,22 @@
+{
+  "name": "cq",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cq.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^2.6.1",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "mongoose": "^5.5.14",
+    "multer": "^1.4.1",
+    "nodemailer": "^6.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

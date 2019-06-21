@@ -1,0 +1,138 @@
+<%-include("headder")-%>
+<%-include("modelofemail")-%>
+<%-include("modelupdate")%>
+<div class="container" style="margin-top:20px;">
+  <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <th>Name</th>
+            <th>Email</th>
+            <th>city</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </thead>
+        <tbody>
+        </tbody>
+        </table>
+
+    </table>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script>
+    var table;
+ $(document).ready(function () {
+    table= $('#example').DataTable({
+               "paging": true,
+               "processing": true,
+               "serverSide": true,
+               'ajax': {
+                'url': '/userlist' ,
+                'type': 'POST',
+                 }
+             ,
+             'columns':
+                  [
+                      { 'data': 'name'},
+                      { 'data': 'email'},
+                      { 'data': 'city' },
+                      { 'data': 'role'},
+                      { 'data': 'phone', "searchable": false,"orderable": false,},
+                      {'data' : 'action',"searchable": false,"orderable": false,}
+                  ],
+              "columnDefs": [
+                  {
+                      "targets" : -1,
+                      "render" :function(data ,type ,row, meta)
+                      { 
+                          data="<center><a class='btn btn-primary btn-sm emailbtn actionbtns'  onclick=mail('"+row.email+"')  data-toggle='modal' data-target='#emailmodel' style='background:#000' ><span class='fa fa-envelope' style='color:#fff'></span></a>&nbsp;<a class='btn btn-primary btn-sm editbtn actionbtns' onclick=update("+JSON.stringify(row)+") data-toggle='modal' data-target='#updatemodel'><span class='fa fa-edit'></span></a>";
+                            if(row.isdeleated == 'activated')
+                            data =data+ "&nbsp;<a class='btn btn-success btn-sm activebtn actionbtns'  id='"+row._id+"'onclick=status('"+row._id+"','"+row.isdeleated+"')><span class='fa fa-check-circle'></span></a></center>";
+                            else
+                             data =data + "&nbsp;<a class='btn btn-warning btn-sm activebtn actionbtns' id='"+row._id+"' onclick=status('"+row._id+"','"+row.isdeleated+"')><span class='fa fa-times-circle'></span></a></center>";
+                        return data;
+                      }
+                  }
+              ]
+ });
+  });
+  
+         function status(a,b)
+             {
+                 if(confirm("Are you sure "))
+                 {
+                    $.ajax({
+                    type:"POST",
+                    data: {'userid' : a ,'status' :b},
+                    
+                    url: "/statuschange",
+                    success: function(result)
+                        {
+                            table.ajax.reload();
+                        }
+                    });
+                 }
+                }
+                    
+            function mail(e)
+            {
+                $('#email').val(e);
+                 
+            }
+            function sendmail()
+                {
+                   var message =$('#message').val();
+                   var subject =$('#subject').val();
+                   $.ajax({
+                        type:"POST",
+                        data: {'email' : "sah" ,'subject' :subject, 'message': message},
+                        url: "/sendmail",
+                        success: function(result){
+                            console.log(result);
+                         }
+                     });
+                }
+                function update(data)
+                {
+                       console.log(data);
+                        $("#tittle").val(data.email);
+                        $("#phone").val(data.phone);
+                        $('#username').val(data.username);
+                        $("#city").val(data.city);
+                        $("#role").val(data.role);
+                        $("#uid").val(data._id);
+                }
+                function updateuser(e)
+                {
+                    if( $("#phone").val()==""  && $('#username').val()=="" && $("#city").val()=="")
+                    {
+                        e.target.setAttibute("data-dismiss","modal");
+                         $.ajax({
+                            type:"POST",
+                            url:'/updateuser',
+                            data:{
+                                'phone': $("#phone").val(),
+                                'username' :$('#username').val(),
+                                'city': $("#city").val(),
+                                'action': $("#action").val(),
+                                'role': $("#role").val(),
+                                'userid':$('#uid').val(),
+                            },
+                            success:function(result)
+                                 {
+                                    table.ajax.reload();
+                                 }
+                             }
+                         );
+                    }
+                    else
+                    {
+                        alert("please fill all the details");
+                    }
+                }
+           
+    </script>
+</html>

@@ -1,0 +1,78 @@
+<%-include("headder")-%>
+<div class="container allSides" >
+    <div class="card" style="height:150px; width :150px; margin :20px; border :1px solid gray;">
+        <img  class="card-img-top" style="height:100% ; width :100%"src="<%=data.image%>" >
+    </div>
+
+<div class="row">
+
+    <div class="col">
+        <div class="card allSides">
+            <div class="card-header">
+                Username
+            </div>
+            <div class="card-body">
+                <%=data.username%>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+            <div class="card allSides">
+                <div class="card-header">
+                    Gender
+                </div>
+                <div class="card-body">
+                    <%=data.gender%>
+                </div>
+            </div>
+        </div>
+    </div>
+  <br>
+  <div class="row">
+    <div class="col">
+        <div class="card allSides">
+            <div class="card-header">
+                Name
+            </div>
+            <div class="card-body">
+                    <%=data.name%>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+            <div class="card allSides">
+                <div class="card-header">
+                    City
+                </div>
+                <div class="card-body">
+                    <%=data.city%>
+                </div>
+            </div>
+        </div>
+    </div>
+  <br>
+    <div class="row">
+    <div class="col">
+        <div class="card allSides">
+            <div class="card-header">
+                D.O.B
+            </div>
+            <div class="card-body">
+                <%-data.dateofbirth-%>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+            <div class="card allSides">
+                <div class="card-header">
+                    Phone 
+                </div>
+                <div class="card-body">
+                    <%=data.phone%>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<%- include("footer")-%>
