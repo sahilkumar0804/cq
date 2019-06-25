@@ -153,6 +153,29 @@ app.post("/adduser",(req,res)=>
          res.render("adduser",{incorect:"<center><div class='alert alert-danger' style='width:90%;'>Username already exists</div></center>",role :req.session.role ,name :req.session.name}); 
       else
       {
+         //mail
+         smtpTrans = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: "skumar2577.ca17@chitkara.edu.in",
+                pass: "5321@sahil"
+            }
+        });
+        mailOpts = {
+            from: 'sahil2577.ca17@chitkara.edu.in',
+            to: req.body.email,
+            subject: "initation for Cq",
+            text: "you are invited  by sahil kumar for Cq ",
+        };
+        smtpTrans.sendMail(mailOpts, function (err, response2715) {
+            if (err) {
+                res.send(err);
+            } else {
+              //  res.send('success');
+            }
+        });
          new user({
            // _id=new mongoose.Types.ObjectId(),
             name:req.body.name,
@@ -273,46 +296,6 @@ var total=0;         // no. of total recrds ...
    
 }
 );
-
- /// communites rendring........
-  
-app.get("/c",(req,res)=>
-{
-   res.render("community/communitespanel.ejs",{role :"comm",name :"sahil"});
-});
-
-app.get("/createcommunity",(req,res)=>
-{
-   res.render("community/createcommunity.ejs",{incorect:"",role :"comm",name :"sahil"});
-});
-
-app.post("/createcommunity",(req,res)=>
-{
-   //   community.findOne({name : "sahil"}).populate("owner").exec((err,data)=>
-   //   {
-   //         if(err)
-   //           throw err;
-   //          console.log(data.owner);
-   //   });
-     community.findOne({name:{$eq : req.body.name}},(err,data)=>
-     {
-         if(data)
-         res.render("community/createcommunity.ejs",{incorect:"already exists",role :"comm",name :"sahil"});
-         else
-           {
-              new community ({
-                 name :req.body.name,
-                 owner :req.session.userid,
-                 member_Ship_rule :req.body.type,
-                 createDate :new Date().toDateString("en"),
-
-              }).save();
-                res.render("community/createcommunity.ejs",{incorect:"sucessfuly created",role :"comm",name :"sahil"});  
-           }
-     });
-});
-
-
 app.post("/statuschange",(req,res)=>
 {
  if(req.body.status =='activated')
@@ -371,12 +354,181 @@ app.post("/updateuser",(req,res)=>
            });
        }
    });
-//invalid routs
-app.get('*', function (req, res) { 
-   res.redirect("/home");
+
+ /// communites rendring........
+  
+app.get("/c",(req,res)=>
+{
+        res.render("community/communitespanel.ejs",{role :req.session.role,name :req.session.name});
 });
 
-app.listen(8008,()=>
+app.get("/createcommunity",(req,res)=>
 {
-console.log("8008");
+   res.render("community/createcommunity.ejs",{incorect:"",role :"comm",name :"sahil"});
+});
+
+//use my communities
+app.post("/communityinfo",(req,res)=>
+{
+  
+      community.find( {$or: [{ owner :(req.session.userid)},{ members: {$in : [req.session.userid]}}],},(err,data)=>
+      {
+         if(data.length!=0)
+            {
+                res.send(data);
+            }
+           else
+                res.send("empty");
+      });
+});
+
+//user community search
+app.get("/search",(req,res)=>
+{
+   res.render("community/communitysearch",{role:req.session.role,name: req.session.name});
+});
+
+app.post("/search",(req,res)=>
+{
+   var exp={$and: [{ owner :{$not : { $eq: req.session.userid  } } },{ members: {$nin : [req.session.userid]}}] };
+  if(req.body.str)
+  {
+   var regex=new RegExp(req.body.str, "i");
+     exp.$and.push({"name" :regex});
+  }
+   community.find( exp,(err,data)=>
+   {
+         if(data.length!=0)
+         {
+             res.send(data);
+         }
+         else
+             res.send("empty");
+   });
+});
+
+//join community
+app.post("/join",(req,res)=>
+{
+   console.log(req.body.id);
+   community.findOne({_id : req.body.id},(err,data)=>
+   {
+      if(err)
+         throw err;
+     else{
+      data.members.push(req.session.userid);
+      data.save();
+      res.send(true);
+     }
+   });
+});
+app.post("/createcommunity",(req,res)=>
+{
+  
+     community.findOne({name:{$eq : req.body.name}},(err,data)=>
+     {
+         if(data)
+            res.render("community/createcommunity.ejs",{incorect:"already exists",role :"comm",name :"sahil"});
+         else
+           {
+              new community ({
+                 name :req.body.name,
+                 owner :req.session.userid,
+                 rule :req.body.type,
+                 createDate :new Date().toDateString("en"),
+                 isdeleated: "activated",
+                 discription: req.body.desc,
+
+              }).save();
+                res.render("community/createcommunity.ejs",{incorect:"sucessfuly created",role :"comm",name :"sahil"});  
+           }
+     });
+});
+
+//cummunity list
+app.get("/communitylist",(req,res)=>
+{
+     res.render("communitylist",{role :req.session.role ,name :req.session.name,img:req.session.img});
+});
+app.post("/communitylist",(req,res)=>
+{
+   var sort ={};
+  let order=req.body.order[0];
+   if(order.column == '0')
+      {
+         if(order.dir == 'asc')
+            sort={ "name":1};
+         else 
+         sort={ "name":-1};
+      }
+   else if(order.column == '1')
+   {
+      if(order.dir == 'asc')
+         sort={ "owner":1};
+      else
+         sort={ "owner": -1};
+   }
+   else if(order.column == '2')
+   {
+      if(order.dir == 'asc')
+       sort={ "createdate": 1};
+      else
+       sort={ "createdate":-1};
+   }
+   else 
+     sort={ "name":1};
+////  count of record
+var total=0;         // no. of total recrds ...
+   // counting of total recorsds in a collection...  . .
+  community.countDocuments({},(err,count)=>{
+      if(!err){
+         total =count;
+      }
+   });
+   
+   //for searching....
+   if (req.body.search.value)
+   {
+      var regex=new RegExp(req.body.search.value, "i");
+      searchStr = { $or: [{'name':regex },{'rule': regex }] };  //
+   }
+   else
+   {
+      searchStr={};
+   }
+   var t=0
+ 
+       community.find(searchStr,null,{ limit:Number(req.body.length),skip:Number(req.body.start),sort:sort}).populate(
+       {
+          path :"owner",
+          select :"name"
+       }
+       ).exec((err,data)=>
+      {
+            if(err)
+              throw err;
+             else{
+               community.countDocuments(searchStr,(err,count)=>
+               {
+                  res.send({"recordsTotal" :  total, "recordsFiltered": count ,data});
+               });
+             }
+      });
+   
+});
+
+app.get("/community/:id",(req,res)=>
+{
+   var id=req.params.id;
+    
+   
+});
+// invalid routs
+// app.get('*', function (req, res) { 
+//    res.redirect("/home");
+// });
+
+app.listen(8000,()=>
+{
+console.log("8000");
 });

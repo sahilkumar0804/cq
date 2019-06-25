@@ -39,7 +39,8 @@ const UserSchema = new mongoose.Schema({
       {
         type:String,
         enum:['pending','confirmed'],
-      }
+      },
+      communities:[{type: Schema.Types.ObjectId, ref: 'communities'}],
 });  //structore of collection users
 
 const user = mongoose.model("users",UserSchema);
@@ -53,16 +54,33 @@ const communitiesSchma = mongoose.Schema(
       type: String,
       unique: true,
       required: true,
-
-
       trim: true
     },
-    member_Ship_rule: String,
+
+    rule:
+    {
+      type:String,
+      enum:['direct','permission'],
+    },
+    discription: String,
+    isdeleated :String,
     owner: {type: Schema.Types.ObjectId, ref: 'users' },
+
     createDate: String,
+
+    image: String,
     members:[ {type: Schema.Types.ObjectId, ref: 'users' }],
 
   }
 );
 const community = mongoose.model("communities", communitiesSchma);
 module.exports.community=community;
+
+const chat =new mongoose.Schema(
+  {
+    message :String,
+    comunnity :[ {type: Schema.Types.ObjectId, ref: 'communities' }],
+    member : {type: Schema.Types.ObjectId, ref: 'users' },
+    comments:[],
+  }
+);
